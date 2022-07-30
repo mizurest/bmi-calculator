@@ -14,6 +14,9 @@
         android:theme="@style/Theme.BMIcalculator"
         tools:targetApi="31">
         <activity
+            android:name=".EditActivity"
+            android:exported="false" />
+        <activity
             android:name=".RegActivity"
             android:exported="false" />
         <activity

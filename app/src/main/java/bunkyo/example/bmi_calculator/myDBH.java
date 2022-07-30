@@ -11,7 +11,7 @@ public class myDBH extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("create table sample (height integer, weight integer, bmi real, created_at integer);");
+        sqLiteDatabase.execSQL("create table sample (height integer, weight integer, bmi real, created_at text);");
     }
 
     @Override

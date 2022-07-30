@@ -3,8 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/BMIcalculator/app/src/main/res/layout/activity_edit.xml" value="0.23369565217391305" />
         <entry key="..\:/BMIcalculator/app/src/main/res/layout/activity_main.xml" value="0.3234375" />
-        <entry key="..\:/BMIcalculator/app/src/main/res/layout/activity_reg.xml" value="0.33" />
+        <entry key="..\:/BMIcalculator/app/src/main/res/layout/activity_reg.xml" value="0.1" />
       </map>
     </option>
   </component>

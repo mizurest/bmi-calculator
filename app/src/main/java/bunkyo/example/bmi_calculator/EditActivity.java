@@ -2,7 +2,6 @@ package bunkyo.example.bmi_calculator;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ActionBar;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,85 +11,90 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
-public class RegActivity extends AppCompatActivity {
-
+public class EditActivity extends AppCompatActivity {
     myDBH helper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_reg);
+        setContentView(R.layout.activity_edit);
 
         helper = new myDBH(this);
+        final SQLiteDatabase db = helper.getWritableDatabase();
 
-        // 初期値
-        Number height = 165;
-        Number weight = 70;
-        Number bmi = 25.71;
-
-        findViewById(R.id.floatingActionButton2).setOnClickListener(lis01);
+        Intent in = getIntent();
+        final String BmiStr = in.getStringExtra("BMI");
+        final String HeightStr = in.getStringExtra("HEIGHT");
+        final String WeightStr = in.getStringExtra("WEIGHT");
+        final String DateStr = in.getStringExtra("WEIGHT");
 
         EditText inputHeight = findViewById(R.id.inputHeight);
-        inputHeight.setText(height.toString());
+        inputHeight.setText(HeightStr);
 
         EditText inputWeight = findViewById(R.id.inputWeight);
-        inputWeight.setText(weight.toString());
+        inputWeight.setText(WeightStr);
 
         TextView btv = findViewById(R.id.bmiTextView);
-        btv.setTextColor(Color.parseColor("#F9D648"));
-        btv.setText(bmi.toString());
+        btv.setText(BmiStr);
 
-        setHeightSeekBar();
-        setWeightSeekbar();
-    }
-
-    // FABクリック時
-    View.OnClickListener lis01 = new View.OnClickListener() {
-        @Override
-        public void onClick(View v){
-            EditText inputHeight = findViewById(R.id.inputHeight);
-            EditText inputWeight = findViewById(R.id.inputWeight);
-            TextView displayBmi = findViewById(R.id.bmiTextView);
-
-            //Dateを生成する
-            Date date = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
-            String formatDate = sdf.format(date);
-
-            insertDB(
-                    Integer.parseInt(inputHeight.getText().toString()),
-                    Integer.parseInt(inputWeight.getText().toString()),
-                    Double.parseDouble(displayBmi.getText().toString()),
-                    formatDate
-            );
-
-            // 画面遷移
-            Intent in = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(in);
+        // BMIによって文字色を変更する
+        double doubleBmi = Double.parseDouble(BmiStr);
+        if(doubleBmi < 18.5){
+            btv.setTextColor(Color.parseColor("#65A1BD"));
+        }else if(doubleBmi < 25){
+            btv.setTextColor(Color.parseColor("#4F8A4A"));
+        }else if(doubleBmi < 30){
+            btv.setTextColor(Color.parseColor("#F9D648"));
+        }else if(doubleBmi < 35){
+            btv.setTextColor(Color.parseColor("#E4985E"));
+        }else{
+            btv.setTextColor(Color.parseColor("#D55C5B"));
         }
-    };
 
-    // DBにデータを登録する処理
-    public void insertDB(int height, int weight ,double bmi, String created_at){
-        SQLiteDatabase db = helper.getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("height", height);
-        cv.put("weight", weight);
-        cv.put("bmi", bmi);
-        cv.put("created_at", created_at);
-        db.insert("sample", null, cv);
-        db.close();
+        findViewById(R.id.floatingActionButton2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: データの更新
+                ContentValues cv = new ContentValues();
+                EditText inputHeight = findViewById(R.id.inputHeight);
+                EditText inputWeight = findViewById(R.id.inputWeight);
+                TextView btv = findViewById(R.id.bmiTextView);
+
+                cv.put("height", String.valueOf(inputHeight.getText()));
+                cv.put("weight", String.valueOf(inputWeight.getText()));
+                cv.put("bmi", String.valueOf(btv.getText()));
+                db.update("sample", cv, "height=" +HeightStr+ " AND weight="+WeightStr+ " AND bmi=" + BmiStr, null);
+
+                // 画面遷移
+                Intent in = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(in);
+            }
+        });
+
+        findViewById(R.id.floatingActionButton3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: データの削除
+                db.delete("sample", "height=? AND weight=? AND bmi=?",
+                        new String[]{HeightStr, WeightStr, BmiStr});
+                // 画面遷移
+                Intent in = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(in);
+            }
+        });
+
+        int defaultHeight = Integer.parseInt(HeightStr) - 120;
+        int defaultWeight = Integer.parseInt(WeightStr) - 30;
+        setHeightSeekBar(defaultHeight);
+        setWeightSeekbar(defaultWeight);
     }
 
-    public void setHeightSeekBar(){
+    public void setHeightSeekBar(int defaultHeight){
         SeekBar seekBarH = findViewById(R.id.seekBarHeight);
-        seekBarH.setProgress(45); // 初期値
+        seekBarH.setProgress(defaultHeight); // 初期値
         seekBarH.setMax(90); // 最大値
         seekBarH.setOnSeekBarChangeListener(
                 new SeekBar.OnSeekBarChangeListener() {
@@ -136,9 +140,9 @@ public class RegActivity extends AppCompatActivity {
         );
     }
 
-    public void setWeightSeekbar(){
+    public void setWeightSeekbar(int defaultWeight){
         SeekBar seekBarW = findViewById(R.id.seekBarWeight);
-        seekBarW.setProgress(40); // 初期値
+        seekBarW.setProgress(defaultWeight); // 初期値
         seekBarW.setMax(170); // 最大値
         seekBarW.setOnSeekBarChangeListener(
                 new SeekBar.OnSeekBarChangeListener() {
@@ -183,5 +187,4 @@ public class RegActivity extends AppCompatActivity {
         );
 
     }
-
 }
